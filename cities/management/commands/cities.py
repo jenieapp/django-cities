@@ -995,16 +995,14 @@ class Command(BaseCommand):
                 pc.region = None
 
             if pc.subregion_name != '':
-                try:
-                    with transaction.atomic():
-                        pc.subregion = Subregion.objects.get(
-                            Q(region__name_std__iexact=pc.region_name) |
-                            Q(region__name__iexact=pc.region_name),
-                            Q(name_std__iexact=pc.subregion_name) |
-                            Q(name__iexact=pc.subregion_name),
-                            region__country=pc.country)
-                except Subregion.DoesNotExist:
-                    pc.subregion = None
+
+                pc.subregion = Subregion.objects.filter(
+                    Q(region__name_std__iexact=pc.region_name) |
+                    Q(region__name__iexact=pc.region_name),
+                    Q(name_std__iexact=pc.subregion_name) |
+                    Q(name__iexact=pc.subregion_name),
+                    region__country=pc.country).first()
+
             else:
                 pc.subregion = None
 
